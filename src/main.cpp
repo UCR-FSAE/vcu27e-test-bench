@@ -7,6 +7,9 @@
 #include <SPI.h>
 #include "mcp2515_can.h"
 
+// ------------- Pinouts -------------
+// TBD
+
 const int SPI_CS_PIN = 9;
 
 mcp2515_can CAN(SPI_CS_PIN);
@@ -28,5 +31,7 @@ void setup() {
 }
 
 void loop() {
-    
+    // hello world test (delete later)
+    SERIAL_PORT_MONITOR.println("hello world");
+    delay(1000);
 }
