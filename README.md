@@ -7,9 +7,6 @@ We are currently using an arduino uno R3 with a Seeed Studio CAN-Bus Shield V2 t
 * correct torque command code
 * canbus message functions
 
-## Test Details
-define more precisely what the tests are supposed to do...
-
 ## Hardware
 * Arduino UNO R3
 * Seeed Studio CAN-Bus Shield V2
@@ -48,6 +45,12 @@ define more precisely what the tests are supposed to do...
 * VSCode
 * Git
 * PlatformIO (installed through vscode)
+
+## UML Diagram
+plan the classes/functions we will make for the project
+
+## Test Details
+define more precisely what the tests are supposed to do...
 
 ### Usage
 * Open the PlatformIO Project Workspace
