@@ -40,27 +40,23 @@ We are currently using an arduino uno R3 with a Seeed Studio CAN-Bus Shield V2 t
 | Driver Action | 2 | GPIO IN |
 | Tractive System Active | 3 | GPIO IN |
 
-## Installation/Usage
-### Requirements
-* VSCode
-* Git
-* PlatformIO (installed through vscode)
-
 ## UML Diagram
 plan the classes/functions we will make for the project
 
 ## Test Details
 define more precisely what the tests are supposed to do...
 
+## Installation/Usage
+### Requirements
+* VSCode
+* Git
+* PlatformIO (installed through vscode)
+
 ### Usage
 * Open the PlatformIO Project Workspace
 * Build Code (Project Tasks > General, click Build)
 * plug in board and upload code to board(Project Tasks > General, click Upload)
 * Open serial monitor (Project Tasks > General, click Monitor)
-
-alternatively: 
-* pio run -t upload
-* pio device monitor -b 500000
 
 ## Additional links
 [VCU27 GitHub](https://github.com/UCR-FSAE/vcu27E)
