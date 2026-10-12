@@ -2,10 +2,34 @@
 Test bench for vcu27E
 
 ## Project description
-We are currently using an arduino uno R3 with a Seeed Studio CAN-Bus Shield V2 to test the functionality 3 three VCU commands:
-* vcu sends the correct inverter initialization sequence
-* correct torque command code
-* canbus message functions
+We are currently using an arduino uno R3 with a Seeed Studio CAN-Bus Shield V2 to test the functionality of the VCU.
+
+## Test Details
+
+#### RTD Sequence
+
+1) RTD sequence: inject Driver Action + Tractive System Active + BSE(transition to INVERTER_INIT, read buzzer time)
+2) RTD interrupt: stop brake during RTD buzzer (no RTD)
+
+#### Inverter
+
+3) Inverter Handshake Success: complete RTD then send READY
+4) Inverter Startup Timeout Gaurd: complete RTD then send no response
+5) Inverter Startup Fault Check: complete RTD then send FAULT
+6) Inverter CAN Signinal Loss: complete RTD then stop sending inverter messages (vcu enters fault within ?ms)
+
+#### Torque
+
+7) Torque no Drive: torque stays at zero when not DRIVE
+8) Linear Pedal-to-torque Mapping: complete DRIVE then test varying APPS pedal voltage from 0-100% (VCU torque is proportional)
+9) Brake-Throttle Interlock Cutoff: while in DRIVE at > 25% throttle, press brake pedal (VCU overrides input and forces commanded torque to 0)
+10) APPS Implausibility: while in DRIVE inject >10% difference beterrn APPS1 and APPS2 (VCU sets torque to 0 and transitions to FAULT)
+11) Tractive System Disable CAN Check: enter DRIVE, then disable the tractive system(VCU detects the loss of tractive system active status and transitions to FAULT, with commanded torque set to 0)
+
+#### Can Communication
+
+12) CAN transmission Loop Consistency: enter DRIVE, then measure for consistent frames (ex. 100 frames at 10±1ms)
+
 
 ## Hardware
 * Arduino UNO R3
@@ -46,21 +70,11 @@ We are currently using an arduino uno R3 with a Seeed Studio CAN-Bus Shield V2 t
 * Git
 * PlatformIO (installed through vscode)
 
-## UML Diagram
-plan the classes/functions we will make for the project
-
-## Test Details
-define more precisely what the tests are supposed to do...
-
 ### Usage
 * Open the PlatformIO Project Workspace
 * Build Code (Project Tasks > General, click Build)
 * plug in board and upload code to board(Project Tasks > General, click Upload)
 * Open serial monitor (Project Tasks > General, click Monitor)
-
-alternatively: 
-* pio run -t upload
-* pio device monitor -b 500000
 
 ## Additional links
 [VCU27 GitHub](https://github.com/UCR-FSAE/vcu27E)
