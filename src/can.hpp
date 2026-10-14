@@ -6,3 +6,5 @@
 #include "constants.hpp"
 
 extern mcp2515_can CAN;
+
+void setupCANBlocking();
