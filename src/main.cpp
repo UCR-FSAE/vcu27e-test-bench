@@ -26,7 +26,7 @@ void setup() {
     initSerialBlocking();
     initIO();
     
-    if (CAN_OK == CAN.begin(CAN_500KBPS)) {
+    if (CAN_OK == CAN.begin(CAN_500KBPS, MCP_8MHz)) {
         canOk = 1;
         SERIAL_PORT_MONITOR.println("CAN init passed");
     } else {
@@ -59,6 +59,7 @@ void loop() {
     time: 250 ms
         SENT driver=HIGH ts=LOW apps1=LOW apps2=LOW bse=LOW | CAN tx none
         RECV brake=LOW buzzer=LOW | CAN rx none
+    with a frame: CAN rx 0x0C0 = A0 0F 00 00 00 01 00 00 torque=4000
     */
 
     lastPrintMs = millis();
@@ -90,11 +91,17 @@ void loop() {
     SERIAL_PORT_MONITOR.print(" | CAN rx ");
     if (frameReady) { 
         SERIAL_PORT_MONITOR.print("0x0C0 =");
-        // if RTD sequence is enabled, the 6th byte will alternate to 1 or 0 every 500 ms
         for (unsigned char i = 0; i < 8; i++) {
             SERIAL_PORT_MONITOR.print(" ");
-            SERIAL_PORT_MONITOR.print(lastFrame[i]);
+            if (lastFrame[i] < 16) {
+                SERIAL_PORT_MONITOR.print("0");
+            }
+            SERIAL_PORT_MONITOR.print(lastFrame[i], HEX);
         }
+        // bytes 0 and 1 are little-endian torque, byte 5 is enable inverter
+        unsigned int torque = lastFrame[0] | ((unsigned int)lastFrame[1] << 8);
+        SERIAL_PORT_MONITOR.print(" torque=");
+        SERIAL_PORT_MONITOR.print(torque);
         frameReady = 0;
     } else {
         SERIAL_PORT_MONITOR.print("none");
