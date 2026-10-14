@@ -3,5 +3,5 @@
 #include <Arduino.h>
 #include "constants.hpp"
 
-void initIO();
-void initSerialBlocking();
+void setupPins();
+void setupSerialBlocking();

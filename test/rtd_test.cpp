@@ -1,7 +1,8 @@
 #include <unity.h>
 
 void setUp(void) {
-    initIO();
+    setupSerialBlocking()
+    setupPins();
 }
 
 void tearDown(void) {

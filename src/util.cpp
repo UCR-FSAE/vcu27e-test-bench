@@ -1,6 +1,6 @@
 #include "util.hpp"
 
-void initIO() {
+void setupPins() {
     // Set Input Pins
     pinMode(PIN_BRAKE_LIGHT_MONITOR, INPUT);
     pinMode(PIN_BUZZER_MONITOR, INPUT);
@@ -20,7 +20,7 @@ void initIO() {
     digitalWrite(PIN_DRIVER_ACTION_SIM, LOW);
 }
 
-void initSerialBlocking() {
+void setupSerialBlocking() {
     SERIAL_PORT_MONITOR.begin(SERIAL_BAUDRATE);
     while (!SERIAL_PORT_MONITOR) {  }
 }

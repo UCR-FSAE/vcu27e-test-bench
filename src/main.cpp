@@ -23,8 +23,8 @@ int frameReady = 0;
 unsigned char lastFrame[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 
 void setup() {
-    initSerialBlocking();
-    initIO();
+    setupSerialBlocking();
+    setupPins();
     
     if (CAN_OK == CAN.begin(CAN_500KBPS, MCP_8MHz)) {
         canOk = 1;
