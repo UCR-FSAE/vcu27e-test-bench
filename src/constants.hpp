@@ -59,11 +59,12 @@ const uint8_t PEDAL_TEST_VALUES[6] = {
 };
 
 // Pins
-#define PIN_APPS1_SIM 3 
-#define PIN_APPS2_SIM 5 
-#define PIN_BSE_SIM 6 
-#define PIN_DRIVER_ACTION_SIM 7 
-#define PIN_TS_ACTIVE_SIM 8  
+#define PIN_APPS1_SIM 3
+#define PIN_APPS2_SIM 5
+#define PIN_BSE_SIM 6
+#define PIN_DRIVER_ACTION_SIM 7
+#define PIN_TS_ACTIVE_SIM 8
+#define PIN_VCU_RESET A2
 
 #define PIN_BRAKE_LIGHT_MONITOR A0
 #define PIN_BUZZER_MONITOR A1

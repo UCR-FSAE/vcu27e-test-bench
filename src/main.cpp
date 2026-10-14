@@ -25,15 +25,8 @@ unsigned char lastFrame[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 void setup() {
     setupSerialBlocking();
     setupPins();
-    
-    if (CAN_OK == CAN.begin(CAN_500KBPS, MCP_8MHz)) {
-        canOk = 1;
-        SERIAL_PORT_MONITOR.println("CAN init passed");
-    } else {
-        SERIAL_PORT_MONITOR.println("CAN init fail");
-    }
-    
-    SERIAL_PORT_MONITOR.println("Initialization Done.");
+    setupCANBlocking();
+    Serial.println("Initialization Done.");
 }
 
 void loop() {
@@ -67,44 +60,44 @@ void loop() {
     float brakeV = analogRead(PIN_BRAKE_LIGHT_MONITOR) * (5.0f / 1023.0f);
     float buzzerV = analogRead(PIN_BUZZER_MONITOR) * (5.0f / 1023.0f);
 
-    SERIAL_PORT_MONITOR.print("time: ");
-    SERIAL_PORT_MONITOR.print(lastPrintMs);
-    SERIAL_PORT_MONITOR.println(" ms");
+    Serial.print("time: ");
+    Serial.print(lastPrintMs);
+    Serial.println(" ms");
 
-    SERIAL_PORT_MONITOR.print("  SENT driver=");
-    SERIAL_PORT_MONITOR.print(driverHigh ? "HIGH" : "LOW");
-    SERIAL_PORT_MONITOR.print(" ts=");
-    SERIAL_PORT_MONITOR.print(tsHigh ? "HIGH" : "LOW");
-    SERIAL_PORT_MONITOR.print(" apps1=");
-    SERIAL_PORT_MONITOR.print(apps1High ? "HIGH" : "LOW");
-    SERIAL_PORT_MONITOR.print(" apps2=");
-    SERIAL_PORT_MONITOR.print(apps2High ? "HIGH" : "LOW");
-    SERIAL_PORT_MONITOR.print(" bse=");
-    SERIAL_PORT_MONITOR.print(bseHigh ? "HIGH" : "LOW");
-    SERIAL_PORT_MONITOR.println(" | CAN tx none");
+    Serial.print("  SENT driver=");
+    Serial.print(driverHigh ? "HIGH" : "LOW");
+    Serial.print(" ts=");
+    Serial.print(tsHigh ? "HIGH" : "LOW");
+    Serial.print(" apps1=");
+    Serial.print(apps1High ? "HIGH" : "LOW");
+    Serial.print(" apps2=");
+    Serial.print(apps2High ? "HIGH" : "LOW");
+    Serial.print(" bse=");
+    Serial.print(bseHigh ? "HIGH" : "LOW");
+    Serial.println(" | CAN tx none");
 
-    SERIAL_PORT_MONITOR.print("  RECV brake=");
-    SERIAL_PORT_MONITOR.print(brakeV, 2);
-    SERIAL_PORT_MONITOR.print("V buzzer=");
-    SERIAL_PORT_MONITOR.print(buzzerV, 2);
-    SERIAL_PORT_MONITOR.print("V");
-    SERIAL_PORT_MONITOR.print(" | CAN rx ");
+    Serial.print("  RECV brake=");
+    Serial.print(brakeV, 2);
+    Serial.print("V buzzer=");
+    Serial.print(buzzerV, 2);
+    Serial.print("V");
+    Serial.print(" | CAN rx ");
     if (frameReady) { 
-        SERIAL_PORT_MONITOR.print("0x0C0 =");
+        Serial.print("0x0C0 =");
         for (unsigned char i = 0; i < 8; i++) {
-            SERIAL_PORT_MONITOR.print(" ");
+            Serial.print(" ");
             if (lastFrame[i] < 16) {
-                SERIAL_PORT_MONITOR.print("0");
+                Serial.print("0");
             }
-            SERIAL_PORT_MONITOR.print(lastFrame[i], HEX);
+            Serial.print(lastFrame[i], HEX);
         }
         // bytes 0 and 1 are little-endian torque, byte 5 is enable inverter
         unsigned int torque = lastFrame[0] | ((unsigned int)lastFrame[1] << 8);
-        SERIAL_PORT_MONITOR.print(" torque=");
-        SERIAL_PORT_MONITOR.print(torque);
+        Serial.print(" torque=");
+        Serial.print(torque);
         frameReady = 0;
     } else {
-        SERIAL_PORT_MONITOR.print("none");
+        Serial.print("none");
     }
-    SERIAL_PORT_MONITOR.println();
+    Serial.println();
 }

@@ -4,4 +4,6 @@
 #include "constants.hpp"
 
 void setupPins();
+void resetVCU();
 void setupSerialBlocking();
+void endSerialBlocking();
