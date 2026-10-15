@@ -31,7 +31,15 @@ void setup() {
     
     Serial.println("Waiting for inverter initialization sequence...");
     
-    waitForMessage(lastMsg);
+    waitForMsg(lastMsg);
+    
+    Serial.print(lastMsg.id, HEX);
+    Serial.print(" = ");
+    for (unsigned char i = 0; i < 8; i++) {
+        Serial.print(" ");
+        Serial.print(lastMsg.data[i], HEX);
+    }
+    Serial.println("");
     
     if (lastMsg.id != CAN_ID_VCU_TO_INVERTER || lastMsg.length != 8) {
         Serial.println("Missed Disable CMD");
@@ -45,7 +53,16 @@ void setup() {
         }
     }
     
-    waitForMessage(lastMsg);
+    clearMsg(lastMsg);
+    
+    waitForMsg(lastMsg);
+    
+    Serial.print(lastMsg.id);
+    Serial.print(" = ");
+    for (unsigned char i = 0; i < 8; i++) {
+        Serial.print(" ");
+        Serial.print(lastMsg.data[i], HEX);
+    }
     
     if (lastMsg.id != CAN_ID_VCU_TO_INVERTER || lastMsg.length != 8) {
         Serial.println("Missed Enable CMD");
@@ -72,7 +89,7 @@ void setup() {
 void loop() {
     // -------------- CAN frame reading --------------
     // Read CAN frame 0x0C0 (CAN_ID_VCU_TO_INVERTER): stays 0 if not connected    
-    if (getMessage(lastMsg)) {
+    if (getMsg(lastMsg)) {
         if (lastMsg.id != CAN_ID_VCU_TO_INVERTER) clearMsg(lastMsg);
     }
     
@@ -112,15 +129,23 @@ void loop() {
     Serial.print(buzzerV, 2);
     Serial.print("V");
     Serial.print(" | CAN rx ");
-    if (lastMsg.valid) { 
-        Serial.print(lastMsg.id);
+    if (lastMsg.valid) {
+        Serial.print(lastMsg.id, HEX);
         Serial.print(" = ");
+        
         for (unsigned char i = 0; i < 8; i++) {
             Serial.print(" ");
-            Serial.print(lastMsg.data[i], HEX);
+            if (lastMsg.data[i] < 16) {
+                Serial.print(lastMsg.data[i], DEC);
+            } else {
+                Serial.print("0x");
+                Serial.print(lastMsg.data[i], HEX);
+            }
         }
+        
         // bytes 0 and 1 are little-endian torque, byte 5 is enable inverter
-        unsigned int torque = lastMsg.data[0] | ((unsigned int)lastMsg.data[1] << 8);
+        unsigned int torque =
+            lastMsg.data[0] | ((unsigned int)lastMsg.data[1] << 8);
         Serial.print(" torque=");
         Serial.print(torque);
         clearMsg(lastMsg);
