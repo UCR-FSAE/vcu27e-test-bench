@@ -10,17 +10,16 @@
 #include "can.hpp"
 #include "util.hpp"
 
+// Sim Output Variables
 int apps1High = 0;
 int apps2High = 0;
 int bseHigh = 0;
 int driverHigh = 0; // LOW(0) means pressed
 int tsHigh = 0;
 
-// ------------- TIMING VARIABLES -------------
+// Loop Variables
 unsigned long lastRunMS = 0;
-int frameReady = 0;
-unsigned char lastId = 0;
-unsigned char lastFrame[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+CANMessage lastMsg;
 
 void setup() {
     setupSerialBlocking();
@@ -30,53 +29,35 @@ void setup() {
     
     // Init Check
     
-    unsigned long id = 0;
-    unsigned char len = 0;
-    unsigned char buf[8];
-    for (unsigned char i = 0; i < 8; i++) buf[i] = 0;
+    waitForMessage(lastMsg);
     
-    while (CAN.checkReceive() != CAN_MSGAVAIL) { }
-    
-    while (CAN.readMsgBufID(&id, &len, buf) != CAN_OK) { }
-    
-    if (id != CAN_ID_VCU_TO_INVERTER || len != 8) {
+    if (lastMsg.id != CAN_ID_VCU_TO_INVERTER || lastMsg.length != 8) {
         Serial.println("Missed Disable CMD");
         return;
     }
     
     for (unsigned char i = 0; i < 8; i++) {
-        if (buf[i] != 0x00) {
+        if (lastMsg.data[i] != 0x00) {
             Serial.println("Missed Disable CMD");
             return;
         }
     }
     
-    id = 0;
-    len = 0;
-    for (unsigned char i = 0; i < 8; i++) buf[i] = 0;
+    waitForMessage(lastMsg);
     
-    while (CAN.checkReceive() != CAN_MSGAVAIL) { }
-    
-    while (CAN.readMsgBufID(&id, &len, buf) != CAN_OK) { }
-    
-    if (id != CAN_ID_VCU_TO_INVERTER || len != 8) {
+    if (lastMsg.id != CAN_ID_VCU_TO_INVERTER || lastMsg.length != 8) {
         Serial.println("Missed Enable CMD");
         return;
     }
     
     for (unsigned char i = 0; i < 8; i++) {
         if (i != 4 || i != 5) {
-            if (buf[i] != 0x00) {
+            if (lastMsg.data[i] != 0x00) {
                 Serial.println("Missed Enable CMD");
                 return;
             }
-        } else if (i == 4) {
-            if (buf[i] != 0x01) {
-                Serial.println("Missed Enable CMD");
-                return;
-            }
-        } else if (i == 5) {
-            if (buf[i] != 0x01) {
+        } else {
+            if (lastMsg.data[i] != 0x01) {
                 Serial.println("Missed Enable CMD");
                 return;
             }
@@ -88,34 +69,21 @@ void setup() {
 
 void loop() {
     // -------------- CAN frame reading --------------
-    // Read CAN frame 0x0C0 (CAN_ID_VCU_TO_INVERTER): stays 0 if not connected
-    if (CAN.checkReceive() == CAN_MSGAVAIL) {
-        unsigned long id = 0;
-        unsigned char len = 0;
-        unsigned char buf[8] = {0, 0, 0, 0, 0, 0, 0, 0};
-        if (CAN.readMsgBufID(&id, &len, buf) == CAN_OK) {
-            if (id == CAN_ID_VCU_TO_INVERTER) {
-                lastId = id;
-                for (unsigned char i = 0; i < 8; i++) {
-                    lastFrame[i] = (i < len) ? buf[i] : 0;
-                }
-                frameReady = 1;
-            }
-        }
+    // Read CAN frame 0x0C0 (CAN_ID_VCU_TO_INVERTER): stays 0 if not connected    
+    if (getMessage(lastMsg)) {
+        if (lastMsg.id != CAN_ID_VCU_TO_INVERTER) clearMsg(lastMsg);
     }
-
+    
     // -------------- Print output every 0.25 s--------------
-    if (millis() - lastRunMS < 250) {
-        return;
-    }
+    if (millis() - lastRunMS < 250) { return; }
+    lastRunMS = millis();
+    
     /* Expected output with vcu not connected:
     time: 250 ms
         SENT driver=HIGH ts=LOW apps1=LOW apps2=LOW bse=LOW | CAN tx none
         RECV brake=LOW buzzer=LOW | CAN rx none
     with a frame: CAN rx 0x0C0 = A0 0F 00 00 00 01 00 00 torque=4000
     */
-
-    lastRunMS = millis();
     // analogRead is 0 at 0 V and 1023 at 5 V.
     float brakeV = analogRead(PIN_BRAKE_LIGHT_MONITOR) * (5.0f / 1023.0f);
     float buzzerV = analogRead(PIN_BUZZER_MONITOR) * (5.0f / 1023.0f);
@@ -142,21 +110,18 @@ void loop() {
     Serial.print(buzzerV, 2);
     Serial.print("V");
     Serial.print(" | CAN rx ");
-    if (frameReady) { 
-        Serial.print(lastId);
+    if (lastMsg.valid) { 
+        Serial.print(lastMsg.id);
         Serial.print(" = ");
         for (unsigned char i = 0; i < 8; i++) {
             Serial.print(" ");
-            if (lastFrame[i] < 16) {
-                Serial.print("0");
-            }
-            Serial.print(lastFrame[i], HEX);
+            Serial.print(lastMsg.data[i], HEX);
         }
         // bytes 0 and 1 are little-endian torque, byte 5 is enable inverter
-        unsigned int torque = lastFrame[0] | ((unsigned int)lastFrame[1] << 8);
+        unsigned int torque = lastMsg.data[0] | ((unsigned int)lastMsg.data[1] << 8);
         Serial.print(" torque=");
         Serial.print(torque);
-        frameReady = 0;
+        clearMsg(lastMsg);
     } else {
         Serial.print("none");
     }
