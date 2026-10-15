@@ -18,7 +18,6 @@ int tsHigh = 0;
 
 // ------------- TIMING VARIABLES -------------
 unsigned long lastPrintMs = 0;
-int canOk = 0;
 int frameReady = 0;
 unsigned char lastFrame[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 
@@ -27,12 +26,13 @@ void setup() {
     setupPins();
     setupCANBlocking();
     Serial.println("Initialization Done.");
+    resetVCU();
 }
 
 void loop() {
     // -------------- CAN frame reading --------------
     // Read CAN frame 0x0C0 (CAN_ID_VCU_TO_INVERTER): stays 0 if not connected
-    if (canOk && CAN.checkReceive() == CAN_MSGAVAIL) {
+    if (CAN.checkReceive() == CAN_MSGAVAIL) {
         unsigned long id = 0;
         unsigned char len = 0;
         unsigned char buf[8] = {0, 0, 0, 0, 0, 0, 0, 0};
