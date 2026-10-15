@@ -28,8 +28,6 @@ void setup() {
     setupCANBlocking();
     resetVCU();
     
-    while (CAN.begin(CAN_500KBPS)) { delay(100); }
-    
     // Init Check
     
     unsigned long id = 0;
