@@ -29,6 +29,8 @@ void setup() {
     
     // Init Check
     
+    Serial.println("Waiting for inverter initialization sequence...");
+    
     waitForMessage(lastMsg);
     
     if (lastMsg.id != CAN_ID_VCU_TO_INVERTER || lastMsg.length != 8) {
@@ -64,7 +66,7 @@ void setup() {
         }
     }
     
-    Serial.println("Initialization Successful.");
+    Serial.println("Inverter Initialization Successful.");
 }
 
 void loop() {
