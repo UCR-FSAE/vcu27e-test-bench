@@ -9,8 +9,8 @@ extern mcp2515_can CAN;
 struct CANMessage {
     bool valid;
     unsigned long id;
-    unsigned char length;
-    unsigned char data[8];
+    byte length;
+    byte data[8];
 };
 
 void setupCANBlocking();

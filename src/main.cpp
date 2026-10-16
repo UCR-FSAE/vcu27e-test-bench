@@ -83,6 +83,10 @@ void setup() {
         }
     }
     
+    const byte data[8] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00};
+    CAN.sendMsgBuf(CAN_ID_INVERTER_TO_VCU, 0x00, 0x00, 0x08, data);
+    Serial.println("Sent Status Message.");
+    
     Serial.println("Inverter Initialization Successful.");
 }
 
