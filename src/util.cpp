@@ -23,11 +23,11 @@ void setupPins() {
 }
 
 void resetVCU() {
-    digitalWrite(PIN_VCU_RESET, LOW);
-    delay(100);
     digitalWrite(PIN_VCU_RESET, HIGH);
     delay(100);
     digitalWrite(PIN_VCU_RESET, LOW);
+    delay(100);
+    digitalWrite(PIN_VCU_RESET, HIGH);
 }
 
 void setupSerialBlocking() {
