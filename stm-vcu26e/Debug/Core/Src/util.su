@@ -1,0 +1,10 @@
+../Core/Src/util.c:21:6:RecalibratePedals	56	static
+../Core/Src/util.c:122:6:ADC_APPSCollection	24	static
+../Core/Src/util.c:141:6:ADC_BSECollection	16	static
+../Core/Src/util.c:150:7:APPS_CalculateActivationPercentage	16	static
+../Core/Src/util.c:174:7:Drive_CalculateTorqueCommand	16	static
+../Core/Src/util.c:179:6:APPS_ImplausibilityCheck	32	static
+../Core/Src/util.c:213:6:BSE_ImplausibilityCheck	24	static
+../Core/Src/util.c:243:6:timerStart	16	static
+../Core/Src/util.c:253:6:timerReset	16	static
+../Core/Src/util.c:261:6:timerExpires	24	static

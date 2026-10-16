@@ -1,0 +1,10 @@
+../Core/Src/util.c:21:6:RecalibratePedals	17
+../Core/Src/util.c:122:6:ADC_APPSCollection	3
+../Core/Src/util.c:141:6:ADC_BSECollection	2
+../Core/Src/util.c:150:7:APPS_CalculateActivationPercentage	24
+../Core/Src/util.c:174:7:Drive_CalculateTorqueCommand	1
+../Core/Src/util.c:179:6:APPS_ImplausibilityCheck	10
+../Core/Src/util.c:213:6:BSE_ImplausibilityCheck	7
+../Core/Src/util.c:243:6:timerStart	2
+../Core/Src/util.c:253:6:timerReset	1
+../Core/Src/util.c:261:6:timerExpires	3

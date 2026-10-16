@@ -1,0 +1,2 @@
+../Core/Src/rtd.c:14:6:InverterCheck	8	static
+../Core/Src/rtd.c:26:6:RTDCheck	16	static
