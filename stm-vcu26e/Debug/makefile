@@ -58,34 +58,34 @@ $(wildcard ../makefile.init) \
 $(wildcard ../makefile.targets) \
 
 
-BUILD_ARTIFACT_NAME := vcu26E
+BUILD_ARTIFACT_NAME := stm-vcu26e
 BUILD_ARTIFACT_EXTENSION := elf
 BUILD_ARTIFACT_PREFIX :=
 BUILD_ARTIFACT := $(BUILD_ARTIFACT_PREFIX)$(BUILD_ARTIFACT_NAME)$(if $(BUILD_ARTIFACT_EXTENSION),.$(BUILD_ARTIFACT_EXTENSION),)
 
 # Add inputs and outputs from these tool invocations to the build variables 
 EXECUTABLES += \
-vcu26E.elf \
+stm-vcu26e.elf \
 
 MAP_FILES += \
-vcu26E.map \
+stm-vcu26e.map \
 
 SIZE_OUTPUT += \
 default.size.stdout \
 
 OBJDUMP_LIST += \
-vcu26E.list \
+stm-vcu26e.list \
 
 
 # All Target
 all: main-build
 
 # Main-build Target
-main-build: vcu26E.elf secondary-outputs
+main-build: stm-vcu26e.elf secondary-outputs
 
 # Tool invocations
-vcu26E.elf vcu26E.map: $(OBJS) $(USER_OBJS) C:\Users\evany\source\fsae\stm\vcu26E\STM32F756ZGTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-g++ -o "vcu26E.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m7 -T"C:\Users\evany\source\fsae\stm\vcu26E\STM32F756ZGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="vcu26E.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv5-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
+stm-vcu26e.elf stm-vcu26e.map: $(OBJS) $(USER_OBJS) C:\Users\evany\source\fsae\vcu27e-test-bench\stm-vcu26e\STM32F756ZGTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-g++ -o "stm-vcu26e.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m7 -T"C:\Users\evany\source\fsae\vcu27e-test-bench\stm-vcu26e\STM32F756ZGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="stm-vcu26e.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv5-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
@@ -94,14 +94,14 @@ default.size.stdout: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
 	@echo 'Finished building: $@'
 	@echo ' '
 
-vcu26E.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "vcu26E.list"
+stm-vcu26e.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "stm-vcu26e.list"
 	@echo 'Finished building: $@'
 	@echo ' '
 
 # Other Targets
 clean:
-	-$(RM) default.size.stdout vcu26E.elf vcu26E.list vcu26E.map
+	-$(RM) default.size.stdout stm-vcu26e.elf stm-vcu26e.list stm-vcu26e.map
 	-@echo ' '
 
 secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST)
