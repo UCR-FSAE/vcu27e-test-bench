@@ -57,12 +57,13 @@ void setup() {
     
     waitForMsg(lastMsg);
     
-    Serial.print(lastMsg.id);
+    Serial.print(lastMsg.id, HEX);
     Serial.print(" = ");
     for (unsigned char i = 0; i < 8; i++) {
         Serial.print(" ");
         Serial.print(lastMsg.data[i], HEX);
     }
+    Serial.println("");
     
     if (lastMsg.id != CAN_ID_VCU_TO_INVERTER || lastMsg.length != 8) {
         Serial.println("Missed Enable CMD");
@@ -82,10 +83,6 @@ void setup() {
             }
         }
     }
-    
-    const byte statusData[8] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00};
-    CAN.sendMsgBuf(CAN_ID_INVERTER_TO_VCU, 0x00, 0x00, 0x08, statusData);
-    Serial.println("Sent Status Message.");
     
     Serial.println("Inverter Initialization Successful.");
 }
