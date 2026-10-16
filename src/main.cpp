@@ -83,22 +83,26 @@ void setup() {
         }
     }
     
-    const byte data[8] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00};
-    CAN.sendMsgBuf(CAN_ID_INVERTER_TO_VCU, 0x00, 0x00, 0x08, data);
+    const byte statusData[8] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00};
+    CAN.sendMsgBuf(CAN_ID_INVERTER_TO_VCU, 0x00, 0x00, 0x08, statusData);
     Serial.println("Sent Status Message.");
     
     Serial.println("Inverter Initialization Successful.");
 }
 
 void loop() {
+    // Send Simulated Inverter Status
+    const byte statusData[8] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00};
+    CAN.trySendMsgBuf(CAN_ID_INVERTER_TO_VCU, 0x00, 0x00, 0x08, statusData);
+    
     // -------------- CAN frame reading --------------
     // Read CAN frame 0x0C0 (CAN_ID_VCU_TO_INVERTER): stays 0 if not connected    
     if (getMsg(lastMsg)) {
         if (lastMsg.id != CAN_ID_VCU_TO_INVERTER) clearMsg(lastMsg);
     }
     
-    // -------------- Print output every 0.25 s--------------
-    if (millis() - lastRunMS < 250) { return; }
+    // -------------- Print output every 0.10 s--------------
+    if (millis() - lastRunMS < 100) { return; }
     lastRunMS = millis();
     
     /* Expected output with vcu not connected:
