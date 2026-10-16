@@ -23,7 +23,6 @@ CANMessage lastMsg;
 bool init_success = false;
 
 enum inverter_state { ENABLED, DISABLED, STARTUP };
-
 inverter_state inv_state;
 
 void setup() {
@@ -51,44 +50,37 @@ void setup() {
         if (inv_state == STARTUP) {
             if (lastMsg.id != CAN_ID_VCU_TO_INVERTER || lastMsg.length != 8) {
                 Serial.println("Missed Disable CMD");
-                return;
             } else {
                 for (unsigned char i = 0; i < 8; i++) {
                     if (lastMsg.data[i] != 0x00) {
                         Serial.println("Missed Disable CMD");
-                        return;
                     } else { inv_state = DISABLED; }
                 }
             }
         } else if (inv_state == DISABLED) {
             if (lastMsg.id != CAN_ID_VCU_TO_INVERTER || lastMsg.length != 8) {
                 Serial.println("Missed Enable CMD");
-                return;
-            }
-            
-            for (unsigned char i = 0; i < 8; i++) {
-                if (i == 4) {
-                    if (lastMsg.data[i] != 0x00) {
-                        Serial.println("Missed Enable CMD");
-                        return;
+            } else {
+                for (unsigned char i = 0; i < 8; i++) {
+                    if (i != 4 && i != 5) {
+                        if (lastMsg.data[i] != 0x00) {
+                            Serial.println("Incorrect Enable CMD");
+                        }
                     }
-                } else if (i == 5) {
-                    if (lastMsg.data[i] != 0x01) {
-                        Serial.println("Missed Enable CMD");
-                        return;
-                    }
+                }
+
+                if (lastMsg.data[4] != 0x00 || lastMsg.data[5] != 0x01) {
+                    Serial.println("Incorrect Enable CMD");
+                } else {
+                    inv_state = ENABLED;
+                    init_success = true;
                 }
             }
         }
-        
         clearMsg(lastMsg);
-        
-
-        
-    
-        
         delay(10);
     }
+    
     Serial.println("Inverter Initialization Successful.");
 }
 
