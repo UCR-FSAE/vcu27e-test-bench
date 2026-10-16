@@ -26,20 +26,7 @@ bool getMsg(CANMessage &msg) {
 }
 
 void waitForMsg(CANMessage &msg) {
-    while (CAN.checkReceive() != CAN_MSGAVAIL) { }
-    
-    unsigned long id = 0;
-    unsigned char len = 0;
-    unsigned char buf[8];
-    
-    while (CAN.readMsgBufID(&id, &len, buf) != CAN_OK) { }
-    
-    msg.valid = true;
-    msg.id = id;
-    msg.length = len;
-    for (unsigned char i = 0; i < 8; i++) {
-        msg.data[i] = (i < len) ? buf[i] : 0;
-    }
+    while (!getMsg(msg)) {  }
 }
 
 void clearMsg(CANMessage &msg) {
