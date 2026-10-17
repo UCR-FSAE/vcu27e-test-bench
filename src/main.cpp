@@ -154,4 +154,11 @@ void loop() {
         Serial.print("none");
     }
     Serial.println();
+
+    if (millis() - lastRunMS >= 100) { 
+        const byte statusData[8] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00};
+        CAN.trySendMsgBuf(CAN_ID_INVERTER_TO_VCU, 0x00, 0x00, 0x08, statusData);
+    }
+    
+    lastRunMS = millis();
 }
