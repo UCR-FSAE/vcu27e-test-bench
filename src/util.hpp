@@ -7,3 +7,4 @@ void setupPins();
 void resetVCU();
 void setupSerialBlocking();
 void endSerialBlocking();
+void waitForInverterInit();

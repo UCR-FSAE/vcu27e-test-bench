@@ -13,15 +13,19 @@
 #define CAN_BAUDRATE 500000ULL
 
 // CAN Messages
-
-#define CAN_DATA_LENGTH 8
+#define CAN_DATA_MAX 8
 
 // CAN IDS
 
-// Inverter Initialization
+// Inverter
 #define CAN_ID_VCU_TO_INVERTER 0x0C0
 #define CAN_ID_INVERTER_CLEAR 0x0C1
 #define CAN_ID_INVERTER_TO_VCU 0x0AA
+
+// Inverter Init Data
+#define DISABLE_CMD_DATA { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }
+#define ENABLE_CMD_DATA { 0x00, 0x00, 0x00, 0x00, 0x01, 0x01, 0x00, 0x00 }
+const byte STATUS_DATA[CAN_DATA_MAX] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00 };
 
 // Inverter Commands
 #define INVERTER_DIRECTION_FORWARD 0x00
@@ -54,9 +58,7 @@
 #define MAX_TORQUE_COMMAND 4000.0f 
 
 // Pedal Test Values
-const uint8_t PEDAL_TEST_VALUES[6] = {
-    0, 10, 25, 50, 75, 100
-};
+const uint8_t PEDAL_TEST_VALUES[6] = { 0, 10, 25, 50, 75, 100 };
 
 // Pins
 #define PIN_APPS1_SIM 3

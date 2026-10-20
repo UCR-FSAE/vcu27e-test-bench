@@ -1,3 +1,4 @@
+#include "can.hpp"
 #include "util.hpp"
 
 void setupPins() {
@@ -38,4 +39,64 @@ void setupSerialBlocking() {
 void endSerialBlocking() {
     Serial.end();
     while (Serial) { }
+}
+
+void waitForInverterInit() {
+    enum WaitState { WAIT_FOR_DISABLE, WAIT_FOR_ENABLE, SUCCESS } waitState;
+    waitState = WAIT_FOR_DISABLE;
+    CANMessage lastMsg;
+    
+    // Must be only used when Serial is initialized
+    if (!Serial) return;
+    
+    while (waitState != SUCCESS) {
+        Serial.println("Waiting for inverter initialization sequence...");
+        
+        waitForMsg(lastMsg);
+        printMsg(lastMsg);
+        
+        switch (waitState) {
+            case WAIT_FOR_DISABLE:
+                switch (checkMsg(lastMsg, EXPECTED_DISABLE_CMD)) {
+                    case MsgMatch::WRONG_ID:
+                        Serial.println("Missed Disable CMD");
+                        break;
+                    case MsgMatch::WRONG_LENGTH:
+                        Serial.println("Wrong Disable Length");
+                        break;
+                    case MsgMatch::WRONG_DATA:
+                        Serial.println("Wrong Disable Data");
+                        break;
+                    case MsgMatch::MATCHED:
+                        Serial.println("Got Disable CMD");
+                        waitState = WAIT_FOR_ENABLE;
+                        break;
+                }
+                break;
+            case WAIT_FOR_ENABLE:
+                switch (checkMsg(lastMsg, EXPECTED_ENABLE_CMD)) {
+                    case MsgMatch::WRONG_ID:
+                        Serial.println("Missed Enable CMD");
+                        break;
+                    case MsgMatch::WRONG_LENGTH:
+                        Serial.println("Wrong Enable Length");
+                        break;
+                    case MsgMatch::WRONG_DATA:
+                        Serial.println("Wrong Enable Data");
+                        break;
+                    case MsgMatch::MATCHED:
+                        Serial.println("Got Enable CMD");
+                        waitState = SUCCESS;
+                        break;
+                }
+                break;
+            case SUCCESS:
+                break;
+        }
+        
+        clearMsg(lastMsg);
+        delay(100);
+    }
+    
+    Serial.println("Inverter Initialization Successful.");
 }
