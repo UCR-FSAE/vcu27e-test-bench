@@ -95,7 +95,7 @@ void waitForInverterInit() {
         }
         
         clearMsg(lastMsg);
-        delay(100);
+        delay(10);
     }
     
     Serial.println("Inverter Initialization Successful.");

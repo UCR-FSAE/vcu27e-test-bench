@@ -21,7 +21,7 @@ void loop() {
     static unsigned long lastRunMS = 0;
     static CANMessage lastMsg;
     
-    if (millis() - lastRunMS < 100) { return; }
+    if (millis() - lastRunMS < 10) { return; }
     lastRunMS = millis();
     
     if (getMsg(lastMsg)) printMsg(lastMsg);
