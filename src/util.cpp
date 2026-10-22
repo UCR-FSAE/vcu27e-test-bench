@@ -42,7 +42,9 @@ void endSerialBlocking() {
 }
 
 void sendStatusMsg(bool isEnabled, bool isLocked) {
+    byte STATUS_DATA[CAN_DATA_MAX] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
     STATUS_DATA[6] = (isEnabled ? 0x01 : 0x00) | (isLocked ? 0x80 : 0x00);
+    
     CAN.trySendMsgBuf(CAN_ID_INVERTER_TO_VCU, 0x00, 0x00, CAN_DATA_MAX, STATUS_DATA);
 }
 
@@ -103,7 +105,7 @@ void waitForInverterInit() {
         }
         
         clearMsg(lastMsg);
-        delay(10);
+        delay(30);
     }
     
     sendStatusMsg(true, false);
