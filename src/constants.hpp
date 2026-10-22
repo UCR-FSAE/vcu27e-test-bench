@@ -25,7 +25,6 @@
 // Inverter Init Data
 #define DISABLE_CMD_DATA { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }
 #define ENABLE_CMD_DATA { 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00 }
-const byte STATUS_DATA[CAN_DATA_MAX] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00 };
 
 // Inverter Commands
 #define INVERTER_DIRECTION_FORWARD 0x00
@@ -33,7 +32,9 @@ const byte STATUS_DATA[CAN_DATA_MAX] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0
 #define INVERTER_ENABLE 0x01
 #define INVERTER_DISABLE 0x00
 // InverterCheck() bit 0 of byte 6
-#define INVERTER_STATUS_READY 0x01 
+#define INVERTER_STATUS_ENABLED 0x01 
+// bit 7 of byte 6, 0 = inverter is NOT locked, 1 = inverter is locked
+#define INVERTER_STATUS_LOCKOUT 0x80
 
 // Timings
 #define INVERTER_INIT_GAP_MS 500 

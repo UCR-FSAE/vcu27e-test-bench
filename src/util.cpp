@@ -41,6 +41,11 @@ void endSerialBlocking() {
     while (Serial) { }
 }
 
+void sendStatusMsg(bool isEnabled, bool isLocked) {
+    STATUS_DATA[6] = (isEnabled ? 0x01 : 0x00) | (isLocked ? 0x80 : 0x00);
+    CAN.trySendMsgBuf(CAN_ID_INVERTER_TO_VCU, 0x00, 0x00, CAN_DATA_MAX, STATUS_DATA);
+}
+
 void waitForInverterInit() {
     enum WaitState { WAIT_FOR_DISABLE, WAIT_FOR_ENABLE, SUCCESS } waitState;
     waitState = WAIT_FOR_DISABLE;
@@ -54,6 +59,9 @@ void waitForInverterInit() {
         
         waitForMsg(lastMsg);
         printMsg(lastMsg);
+
+        if (waitState == WAIT_FOR_DISABLE) { sendStatusMsg(false, true); }
+        else if (waitState == WAIT_FOR_ENABLE) { sendStatusMsg(false, false); }
         
         switch (waitState) {
             case WAIT_FOR_DISABLE:
@@ -98,5 +106,6 @@ void waitForInverterInit() {
         delay(10);
     }
     
+    sendStatusMsg(true, false);
     Serial.println("Inverter Initialization Successful.");
 }

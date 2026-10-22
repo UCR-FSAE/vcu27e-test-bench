@@ -25,5 +25,5 @@ void loop() {
     lastRunMS = millis();
     
     if (getMsg(lastMsg)) printMsg(lastMsg);
-    sendStatusMsg();
+    sendStatusMsg(true, false);
 }

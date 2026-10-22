@@ -35,4 +35,3 @@ void waitForMsg(CANMessage &msg);
 void printMsg(const CANMessage &msg);
 MsgMatch checkMsg(const CANMessage &msg, const CANMessage &expected);
 void clearMsg(CANMessage &msg);
-void sendStatusMsg();

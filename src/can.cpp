@@ -59,7 +59,3 @@ void clearMsg(CANMessage &msg) {
     msg.length = 0;
     for (byte i = 0; i < msg.length; i++) msg.data[i] = 0;
 }
-
-void sendStatusMsg() {
-    CAN.trySendMsgBuf(CAN_ID_INVERTER_TO_VCU, 0x00, 0x00, CAN_DATA_MAX, STATUS_DATA);
-}
