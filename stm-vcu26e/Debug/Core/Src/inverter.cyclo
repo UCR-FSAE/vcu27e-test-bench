@@ -1,0 +1,5 @@
+../Core/Src/inverter.c:12:6:Inverter_Init	1
+../Core/Src/inverter.c:23:6:Inverter_Process	5
+../Core/Src/inverter.c:55:6:Inverter_TransmitCANMessage	4
+../Core/Src/inverter.c:102:6:Inverter_EnableInverter	1
+../Core/Src/inverter.c:104:6:Inverter_DisableInverter	1

@@ -1,11 +1,14 @@
 #include <unity.h>
 
 void setUp(void) {
-    initIO();
+    setupSerialBlocking()
+    setupPins();
+    setupCANBlocking();
+    resetVCU();
 }
 
 void tearDown(void) {
-    
+    endSerialBlocking();
 }
 
 void test_rtd_sequence() {
