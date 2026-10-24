@@ -14,7 +14,8 @@ void setup() {
     setupPins();
     setupCANBlocking();
     resetVCU();
-    waitForInverterInit();
+    //waitForInverterInit(); // commented to test rtd test, uncomment before merging
+    runRTDTest();
 }
 
 void loop() {

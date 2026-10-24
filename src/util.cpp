@@ -111,3 +111,61 @@ void waitForInverterInit() {
     sendStatusMsg(true, false);
     Serial.println("Inverter Initialization Successful.");
 }
+
+static bool buzzerIsOn(int raw) {
+    // check that buzzer is on (600 * 5)/1023 = 2.93V
+    return raw > 600;
+}
+
+void runRTDTest() {
+    enum Phase { WAIT_HIGH, WAIT_LOW };
+    Phase phase = WAIT_HIGH;
+
+    unsigned long highStart = 0;
+    unsigned long highMs = 0;
+    unsigned long lastStatus = 0;
+
+    bool buzzDone = false;
+    bool buzzOk = false;
+
+    Serial.println("RTD test start");
+
+    // TODO: add DAC control
+    // TODO: add Traction system disabled check
+
+    while (!buzzDone) {
+        bool on = buzzerIsOn(analogRead(PIN_BUZZER_MONITOR));
+
+        switch (phase) {
+            case WAIT_HIGH:
+                if (on) {
+                    highStart = millis();
+                    phase = WAIT_LOW;
+                    Serial.println("RTD buzzer HIGH");
+                }
+                break;
+
+            case WAIT_LOW:
+                if (!on) {
+                    highMs = millis() - highStart;
+                    buzzOk = highMs >= BUZZER_TIME_MIN_MS &&
+                             highMs <= BUZZER_TIME_MAX_MS;
+                    buzzDone = true;
+
+                    Serial.println("RTD buzzer LOW");
+                    Serial.print("ms=");
+                    Serial.print(highMs);
+                    Serial.println(buzzOk ? " ok" : " out of range");
+                }
+                break;
+        }
+    }
+
+    //waitForInverterInit();  // commented to test rtd test, uncomment before merging
+
+    if (buzzOk) {
+        Serial.println("RTD Successful.");
+    } else {
+        Serial.println("RTD failed.");
+    }
+}
