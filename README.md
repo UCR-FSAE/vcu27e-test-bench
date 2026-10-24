@@ -4,22 +4,38 @@ Test bench for vcu27E
 ## Project description
 We are currently using an arduino uno R3 with a Seeed Studio CAN-Bus Shield V2 to test the functionality of the VCU.
 
-## Test Details
-
-RTD sequence (in progress)
-
 ## Hardware
 * Arduino UNO R3
 * Seeed Studio CAN-Bus Shield V2
 * VCU runs on: teensy 4.1 (vcu27), NUCLEO-F756ZG (vcu26)
-* Inverter: 
-* CAN module: 
+* Adafruit MCP4728 Quad DAC with EEPROM
+* 5V to 3.3V level converter
+* Potentiometers 
 
-## Arduino (CAN Shield V2) to VCU
+## Pinouts
+
+<img width="400" height="314" alt="Can bus shield" src="https://github.com/user-attachments/assets/2a5a6887-5a05-4087-bbdd-e4445c919aea" />
+
+<img width="230" height="314" alt="stm f7" src="https://github.com/user-attachments/assets/2b801e57-0d2c-433e-afcf-a170cdcf6c0c" />
+
+| Signal | CAN Shield V2 | STM32 F756ZG |
+|---|---|---|
+| CAN_RX | CANL / CANH | PD0 |
+| CAN_TX | CANL / CANH | PD1 |
+| APPS1 | 3 | PA5 |
+| APPS2 | 5 | PA6 |
+| BSE | 6 | PF8 |
+| Brake Light Output | A0 | PA4 |
+| Buzzer Signal Output | A1 | PB11 |
+| Driver Action | 7 | PB10 |
+| Tractive System Active | 8 | PB9 |
+
+<img width="340" height="314" alt="teensy4.1" src="https://github.com/user-attachments/assets/a4dd9b3f-cbcf-4613-998c-c900d3ae1294" />
+
 | Signal | CAN Shield V2 | Teensy |
 | :--- | :--- | :--- |
-| CAN_RX | CANL / CANH | CANL / CANH |
-| CAN_TX | CANL / CANH | CANL / CANH |
+| CAN_RX | CANL / CANH | 23 |
+| CAN_TX | CANL / CANH | 22 |
 | APPS1 | 3 | 41 |
 | APPS2 | 5 | 40|
 | BSE | 6 | 39 |
@@ -27,21 +43,49 @@ RTD sequence (in progress)
 | Buzzer Signal Output | A1 | 14 |
 | Driver Action | 7 | 2 |
 | Tractive System Active | 8 | 3 |
-| GND | GND | GND |
 * dont put more than 3.3V into the Teensy
 
-### VCU Pinouts
-| VCU actions: | Teensy | Config |
-| :--- | :---: | :--- |
-| CAN_RX | 23 | CAN_RX |
-| CAN_TX | 22 | CAN_TX |
-| APPS1 | 41 | ADC IN |
-| APPS2 | 40 | ADC IN |
-| BSE | 39 | ADC IN |
-| Brake Light Output | 15 | GPIO OUT |
-| Buzzer Signal Output | 14 | GPIO OUT |
-| Driver Action | 2 | GPIO IN |
-| Tractive System Active | 3 | GPIO IN |
+## Tests
+We are testing our testbench with the vcu26(STM32 F756ZG) to check that the functionality of the vcu27(Teensy 4.1) is consistent with our previous vcu.
+
+### RTD Test (in progress)
+testbench sends the traction system active, driver input, brake pressed. check for correct buzzer timing
+
+### Inverter Initialization Test
+The testbench waits for the disabled command from the VCU and sends a disabled and locked command to the VCU. Once the testbench checks that the disable command is correct, it waits for the enable command from the VCU and sends a message to the VCU to signal it is disabled and unlocked. Once the testbench gets the enable command, it sends a message to the VCU to signal the inverter is enabled and unlocked.
+
+```
+Testbench -> VCU (CAN ID 0x0AA)
+disabled + locked    0 0 0 0 0 0 0 0
+disabled + unlocked  0 0 0 0 0 0 80 0
+enabled + unlocked   0 0 0 0 0 0 1 0
+VCU -> Testbench (CAN ID 0x0C0)
+disable command      0 0 0 0 0 0 0 0
+enable command       0 0 0 0 0 1 0 0
+```
+
+Serial Output:
+```
+Waiting for inverter initialization sequence...
+C0 =  0 0 0 0 0 0 0 0
+Got Disable CMD
+Waiting for inverter initialization sequence...
+C0 =  0 0 0 0 0 1 0 0
+Got Enable CMD
+Inverter Initialization Successful.
+```
+
+### APPS/BSE Test (in progress)
+
+### Motor Spin Test
+Checks that torque values are sent to the correct location on the can bus. The first two bytes are little endian and contain the torque value with byte 0 as the low half and byte 1 as the high half. The vcu sends a 1 on byte 5 to signal inverter enable.
+
+Serial Output:
+```
+C0 = A0 0F 0 0 0 1 0 0
+C0 = A0 0F 0 0 0 1 0 0
+…
+```
 
 ## Installation/Usage
 ### Requirements
@@ -55,40 +99,6 @@ RTD sequence (in progress)
 * plug in board and upload code to board(Project Tasks > General, click Upload)
 * Open serial monitor (Project Tasks > General, click Monitor)
 
-#### How to run tests:
-...
-
-
-#### Expected output of loop:
-the test bench has a loop to print all the inputs recived from the vcu. 
-
-#### How to read the CAN VCU-->INVERTER (0x0C0)
-The vcu26 sends torque command messages on bytes 0 and 1 of 0x0C0 on the can bus.
-
-The test bench prints all 8 bytes in hexadecimal and prints the torque value in decimal:
-
-CAN rx 0x0C0 = A0 0F 00 00 00 01 00 00 torque=4000
-
-A0 0F is little endian with byte 0 as the low half and byte 1 as the high half. The vcu sends a 1 on byte 5 to siginal inverter enable.
-
-vcu26 sends torque command to the inverter as shown below:
-```
-/* Pack torque command (little-endian) */
-txData[0] = (uint8_t)(torque & 0xFF);
-txData[1] = (uint8_t)((torque >> 8) & 0xFF);
-
-/* Speed command (0 for torque control mode) */
-txData[2] = 0;
-txData[3] = 0;
-
-/* Direction and inverter control */
-txData[4] = direction;
-txData[5] = inverterEnable;
-
-/* Torque limits (using default) */
-txData[6] = 0;
-txData[7] = 0;
-```
 ## Additional links
 [VCU27 GitHub](https://github.com/UCR-FSAE/vcu27E)
 
