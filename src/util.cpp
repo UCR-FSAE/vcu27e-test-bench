@@ -49,7 +49,7 @@ bool writeDAC(float apps1_v, float apps2_v, float bse_v) {
     const uint16_t vc = voltsToDAC(bse_v);
     const uint16_t vd = 0;
 
-    // TODO: write dac values
+    // TODO: write dac values (Emad)
     return;
 }
 
@@ -160,6 +160,7 @@ void runRTDTest() {
     Serial.println("RTD test start");
 
     // TODO: add DAC control
+
 
     Serial.println("Sent RTD sequence");
 
