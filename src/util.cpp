@@ -1,5 +1,14 @@
+#include <Adafruit_MCP4728.h>
+#include <Wire.h>
+
 #include "can.hpp"
 #include "util.hpp"
+
+static Adafruit_MCP4728 dac;
+
+static uint16_t voltsToDAC(float volts) {
+    // TODO: convert volts to DAC
+}
 
 void setupPins() {
     // Set Input Pins
@@ -7,20 +16,41 @@ void setupPins() {
     pinMode(PIN_BUZZER_MONITOR, INPUT);
     
     // Set Output Pins
-    pinMode(PIN_APPS1_SIM, OUTPUT);
-    pinMode(PIN_APPS2_SIM, OUTPUT);
-    pinMode(PIN_BSE_SIM, OUTPUT);
+    // pinMode(PIN_APPS1_SIM, OUTPUT);
+    // pinMode(PIN_APPS2_SIM, OUTPUT);
+    // pinMode(PIN_BSE_SIM, OUTPUT);
     pinMode(PIN_TS_ACTIVE_SIM, OUTPUT);
     pinMode(PIN_DRIVER_ACTION_SIM, OUTPUT);
     pinMode(PIN_VCU_RESET, OUTPUT);
-    
+
     // Set Initial Values
-    digitalWrite(PIN_APPS1_SIM, LOW);
-    digitalWrite(PIN_APPS2_SIM, LOW);
-    digitalWrite(PIN_BSE_SIM, LOW);
+    // digitalWrite(PIN_APPS1_SIM, LOW);
+    // digitalWrite(PIN_APPS2_SIM, LOW);
+    // digitalWrite(PIN_BSE_SIM, LOW);
     digitalWrite(PIN_TS_ACTIVE_SIM, LOW);
     digitalWrite(PIN_DRIVER_ACTION_SIM, LOW);
     digitalWrite(PIN_VCU_RESET, LOW);
+}
+
+bool setupDAC() {
+    Wire.begin();
+    if (!dac.begin()) {
+        Serial.println("DAC not found");
+        return false;
+    }
+    // set idle pedals
+    writeDAC(APPS1_MIN_V, APPS2_MIN_V, BSE_RELEASED_V);
+    return;
+}
+
+bool writeDAC(float apps1_v, float apps2_v, float bse_v) {
+    const uint16_t va = voltsToDAC(apps1_v);
+    const uint16_t vb = voltsToDAC(apps2_v);
+    const uint16_t vc = voltsToDAC(bse_v);
+    const uint16_t vd = 0;
+
+    // TODO: write dac values
+    return;
 }
 
 void resetVCU() {

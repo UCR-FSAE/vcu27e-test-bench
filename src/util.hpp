@@ -4,6 +4,8 @@
 #include "constants.hpp"
 
 void setupPins();
+bool setupDAC();
+bool writeDAC(float apps1_v, float apps2_v, float bse_v);
 void resetVCU();
 void setupSerialBlocking();
 void endSerialBlocking();

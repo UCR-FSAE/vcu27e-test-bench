@@ -12,6 +12,7 @@
 void setup() {
     setupSerialBlocking();
     setupPins();
+    setupDAC();
     setupCANBlocking();
     resetVCU();
     waitForInverterInit();
