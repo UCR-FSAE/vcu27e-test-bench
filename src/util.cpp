@@ -7,7 +7,7 @@
 static Adafruit_MCP4728 dac;
 
 static uint16_t voltsToDAC(float volts) {
-    // TODO: convert volts to DAC
+    return (volts/3.3f)*4096;
 }
 
 void setupPins() {
@@ -16,17 +16,11 @@ void setupPins() {
     pinMode(PIN_BUZZER_MONITOR, INPUT);
     
     // Set Output Pins
-    // pinMode(PIN_APPS1_SIM, OUTPUT);
-    // pinMode(PIN_APPS2_SIM, OUTPUT);
-    // pinMode(PIN_BSE_SIM, OUTPUT);
     pinMode(PIN_TS_ACTIVE_SIM, OUTPUT);
     pinMode(PIN_DRIVER_ACTION_SIM, OUTPUT);
     pinMode(PIN_VCU_RESET, OUTPUT);
 
     // Set Initial Values
-    // digitalWrite(PIN_APPS1_SIM, LOW);
-    // digitalWrite(PIN_APPS2_SIM, LOW);
-    // digitalWrite(PIN_BSE_SIM, LOW);
     digitalWrite(PIN_TS_ACTIVE_SIM, LOW);
     digitalWrite(PIN_DRIVER_ACTION_SIM, LOW);
     digitalWrite(PIN_VCU_RESET, LOW);
@@ -49,7 +43,10 @@ bool writeDAC(float apps1_v, float apps2_v, float bse_v) {
     const uint16_t vc = voltsToDAC(bse_v);
     const uint16_t vd = 0;
 
-    // TODO: write dac values (Emad)
+    mcp.setChannelValue(MCP4728_CHANNEL_A, va, MCP4728_VREF_INTERNAL, MCP4728_GAIN_1X);
+    mcp.setChannelValue(MCP4728_CHANNEL_B, vb, MCP4728_VREF_INTERNAL, MCP4728_GAIN_1X);
+    mcp.setChannelValue(MCP4728_CHANNEL_C, vc, MCP4728_VREF_INTERNAL, MCP4728_GAIN_1X);
+    mcp.setChannelValue(MCP4728_CHANNEL_D, vd, MCP4728_VREF_INTERNAL, MCP4728_GAIN_1X);
     return;
 }
 
@@ -160,9 +157,20 @@ void runRTDTest() {
     Serial.println("RTD test start");
 
     // TODO: add DAC control
+    // TBD: CANID from vcu to check for state
 
+    // TODO: RTD test: TS disabled during RTD test
+    Serial.println("RTD test: TS disabled during RTD test");
+    bool writeDAC(float 0f, float 0f, float BRAKES_ACTIVATION_THRESHOLD_V + .5f);
 
-    Serial.println("Sent RTD sequence");
+    // TODO: RTD test: success
+    Serial.println("RTD test: correct RTD test sequence");
+
+    // TODO: RTD test: TS disabled after RTD test
+    Serial.println("RTD test: TS disabled after RTD test");
+
+    // TODO: RTD test: success after TS disabled fault
+    Serial.println("RTD test: success after TS disabled fault");
 
     while (!buzzDone) {
         bool on = buzzerIsOn(analogRead(PIN_BUZZER_MONITOR));
@@ -190,8 +198,7 @@ void runRTDTest() {
                 break;
         }
     }
-
-    waitForInverterInit();
+    // waitForInverterInit();
 
     if (buzzOk) {
         Serial.println("RTD Successful.");
