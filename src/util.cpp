@@ -1,14 +1,6 @@
-#include <Adafruit_MCP4728.h>
-#include <Wire.h>
-
-#include "can.hpp"
 #include "util.hpp"
 
-static Adafruit_MCP4728 dac;
-
-static uint16_t voltsToDAC(float volts) {
-    return (volts/3.3f)*4096;
-}
+Adafruit_MCP4728 dac;
 
 void setupPins() {
     // Set Input Pins
@@ -22,32 +14,38 @@ void setupPins() {
 
     // Set Initial Values
     digitalWrite(PIN_TS_ACTIVE_SIM, LOW);
-    digitalWrite(PIN_DRIVER_ACTION_SIM, LOW);
+    digitalWrite(PIN_DRIVER_ACTION_SIM, HIGH);
     digitalWrite(PIN_VCU_RESET, LOW);
 }
 
-bool setupDAC() {
+void setupDAC() {
     Wire.begin();
     if (!dac.begin()) {
         Serial.println("DAC not found");
-        return false;
+        return;
     }
-    // set idle pedals
-    writeDAC(APPS1_MIN_V, APPS2_MIN_V, BSE_RELEASED_V);
-    return;
+    
+    setIdlePedals();
 }
 
-bool writeDAC(float apps1_v, float apps2_v, float bse_v) {
-    const uint16_t va = voltsToDAC(apps1_v);
-    const uint16_t vb = voltsToDAC(apps2_v);
-    const uint16_t vc = voltsToDAC(bse_v);
-    const uint16_t vd = 0;
+void writeDAC(float apps1_v, float apps2_v, float bse_v) {
+    uint16_t va = voltsToDAC(apps1_v);
+    uint16_t vb = voltsToDAC(apps2_v);
+    uint16_t vc = voltsToDAC(bse_v);
+    uint16_t vd = 0;
 
-    mcp.setChannelValue(MCP4728_CHANNEL_A, va, MCP4728_VREF_INTERNAL, MCP4728_GAIN_1X);
-    mcp.setChannelValue(MCP4728_CHANNEL_B, vb, MCP4728_VREF_INTERNAL, MCP4728_GAIN_1X);
-    mcp.setChannelValue(MCP4728_CHANNEL_C, vc, MCP4728_VREF_INTERNAL, MCP4728_GAIN_1X);
-    mcp.setChannelValue(MCP4728_CHANNEL_D, vd, MCP4728_VREF_INTERNAL, MCP4728_GAIN_1X);
-    return;
+    dac.setChannelValue(MCP4728_CHANNEL_A, va, MCP4728_VREF_INTERNAL, MCP4728_GAIN_1X);
+    dac.setChannelValue(MCP4728_CHANNEL_B, vb, MCP4728_VREF_INTERNAL, MCP4728_GAIN_1X);
+    dac.setChannelValue(MCP4728_CHANNEL_C, vc, MCP4728_VREF_INTERNAL, MCP4728_GAIN_1X);
+    dac.setChannelValue(MCP4728_CHANNEL_D, vd, MCP4728_VREF_INTERNAL, MCP4728_GAIN_1X);
+}
+
+void setIdlePedals() {
+    writeDAC(APPS1_MIN_V, APPS2_MIN_V, BSE_MIN_V);
+}
+
+uint16_t voltsToDAC(float volts) {
+    return (volts / 3.3f) * 4096;
 }
 
 void resetVCU() {
@@ -139,66 +137,56 @@ void waitForInverterInit() {
     Serial.println("Inverter Initialization Successful.");
 }
 
-static bool buzzerIsOn(int raw) {
-    // check that buzzer is on (600 * 5)/1023 = 2.93V
-    return raw > 600;
+bool buzzerOn() {
+    return digitalRead(PIN_BUZZER_MONITOR);
 }
 
+void beRTD() {
+    digitalWrite(PIN_TS_ACTIVE_SIM, HIGH);
+    writeDAC(APPS1_MIN_V, APPS2_MIN_V, BRAKES_ACTIVATION_THRESHOLD_V + .5f);
+    digitalWrite(PIN_DRIVER_ACTION_SIM, LOW);
+}
+
+// TODO: Implement case when tractive system is disabled in middle of sequence.
 void runRTDTest() {
-    enum Phase { WAIT_HIGH, WAIT_LOW };
-    Phase phase = WAIT_HIGH;
+    resetVCU();
+    enum TestState { NOTHING, BUZZ_HIGH, BUZZ_LOW, DONE };
+    TestState state = NOTHING;
 
     unsigned long highStart = 0;
     unsigned long highMs = 0;
-
-    bool buzzDone = false;
     bool buzzOk = false;
 
     Serial.println("RTD test start");
 
-    // TODO: add DAC control
-    // TBD: CANID from vcu to check for state
+    beRTD();
 
-    // TODO: RTD test: TS disabled during RTD test
-    Serial.println("RTD test: TS disabled during RTD test");
-    bool writeDAC(float 0f, float 0f, float BRAKES_ACTIVATION_THRESHOLD_V + .5f);
-
-    // TODO: RTD test: success
-    Serial.println("RTD test: correct RTD test sequence");
-
-    // TODO: RTD test: TS disabled after RTD test
-    Serial.println("RTD test: TS disabled after RTD test");
-
-    // TODO: RTD test: success after TS disabled fault
-    Serial.println("RTD test: success after TS disabled fault");
-
-    while (!buzzDone) {
-        bool on = buzzerIsOn(analogRead(PIN_BUZZER_MONITOR));
-
-        switch (phase) {
-            case WAIT_HIGH:
-                if (on) {
+    while (state != DONE) {
+        switch (state) {
+            case BUZZ_HIGH:
+                if (buzzerOn()) {
                     highStart = millis();
-                    phase = WAIT_LOW;
+                    state = BUZZ_LOW;
                     Serial.println("RTD buzzer HIGH");
                 }
                 break;
-            case WAIT_LOW:
-                if (!on) {
+            case BUZZ_LOW:
+                if (!buzzerOn()) {
                     highMs = millis() - highStart;
                     buzzOk = highMs >= BUZZER_TIME_MIN_MS &&
                              highMs <= BUZZER_TIME_MAX_MS;
-                    buzzDone = true;
 
                     Serial.println("RTD buzzer LOW");
                     Serial.print("ms=");
                     Serial.print(highMs);
                     Serial.println(buzzOk ? " in range" : " out of range");
                 }
+                state = DONE;
                 break;
         }
     }
-    // waitForInverterInit();
+    
+    waitForInverterInit();
 
     if (buzzOk) {
         Serial.println("RTD Successful.");
