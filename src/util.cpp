@@ -151,7 +151,7 @@ void beRTD() {
 void runRTDTest() {
     resetVCU();
     enum TestState { NOTHING, BUZZ_HIGH, BUZZ_LOW, DONE };
-    TestState state = NOTHING;
+    TestState state = BUZZ_HIGH;
 
     unsigned long highStart = 0;
     unsigned long highMs = 0;
@@ -159,7 +159,7 @@ void runRTDTest() {
 
     Serial.println("RTD test start");
 
-    beRTD();
+    //beRTD();
 
     while (state != DONE) {
         switch (state) {
@@ -180,8 +180,8 @@ void runRTDTest() {
                     Serial.print("ms=");
                     Serial.print(highMs);
                     Serial.println(buzzOk ? " in range" : " out of range");
+                    state = DONE;
                 }
-                state = DONE;
                 break;
         }
     }
