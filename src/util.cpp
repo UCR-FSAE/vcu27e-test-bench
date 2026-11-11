@@ -150,7 +150,7 @@ void runRTDTest() {
 
     Serial.println("RTD test start");
 
-    //beRTD();
+    beRTD();
 
     while (state != DONE) {
         switch (state) {
@@ -185,5 +185,34 @@ void runRTDTest() {
 }
 
 void runBrakeLightTest() {
+    writeDAC(APPS1_MIN_V, APPS2_MIN_V, BRAKES_ACTIVATION_THRESHOLD_V - 0.1f);
+    delay(100);
     
+    Serial.println("Brake not pressed, should not be on");
+    if (!digitalRead(PIN_BRAKE_LIGHT_MONITOR)) {
+        Serial.println("True");
+    } else {
+        Serial.println("False");
+    }
+    
+    writeDAC(APPS1_MIN_V, APPS2_MIN_V, BRAKES_ACTIVATION_THRESHOLD_V + 2.0f);
+    delay(100);
+    
+    Serial.println("Brake pressed, should be on");
+    Serial.println(analogRead(PIN_BRAKE_LIGHT_MONITOR));
+    if (digitalRead(PIN_BRAKE_LIGHT_MONITOR)) {
+        Serial.println("True");
+    } else {
+        Serial.println("False");
+    }
+    
+    writeDAC(APPS1_MIN_V, APPS2_MIN_V, BRAKES_ACTIVATION_THRESHOLD_V - 0.1f);
+    delay(100);
+    
+    Serial.println("Brake not pressed, should not be on");
+    if (!digitalRead(PIN_BRAKE_LIGHT_MONITOR)) {
+        Serial.println("True");
+    } else {
+        Serial.println("False");
+    }
 }

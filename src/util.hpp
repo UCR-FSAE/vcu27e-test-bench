@@ -22,6 +22,7 @@ void sendStatusMsg(bool isEnabled, bool isLocked);
 void waitForInverterInit();
 
 bool buzzerOn();
+void beRTD();
 void runRTDTest();
 
 void runBrakeLightTest();

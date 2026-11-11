@@ -14,8 +14,9 @@ void setup() {
     setupPins();
     setupDAC();
     setupCANBlocking();
-    runRTDTest();
-    waitForInverterInit();
+    //beRTD();
+    //waitForInverterInit();
+    //delay(100);
     runBrakeLightTest();
 }
 
