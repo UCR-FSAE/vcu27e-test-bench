@@ -15,8 +15,6 @@ void writeDAC(float apps1_v, float apps2_v, float bse_v);
 uint16_t voltsToDAC(float volts);
 void setIdlePedals();
 
-void resetVCU();
-
 void setupSerialBlocking();
 void endSerialBlocking();
 
@@ -25,3 +23,5 @@ void waitForInverterInit();
 
 bool buzzerOn();
 void runRTDTest();
+
+void runBrakeLightTest();

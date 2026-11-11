@@ -48,14 +48,6 @@ uint16_t voltsToDAC(float volts) {
     return (volts / 3.3f) * 4096;
 }
 
-void resetVCU() {
-    digitalWrite(PIN_VCU_RESET, LOW);
-    delay(100);
-    digitalWrite(PIN_VCU_RESET, HIGH);
-    delay(100);
-    digitalWrite(PIN_VCU_RESET, LOW);
-}
-
 void setupSerialBlocking() {
     Serial.begin(SERIAL_BAUDRATE);
     while (!Serial) {  }
@@ -185,12 +177,14 @@ void runRTDTest() {
                 break;
         }
     }
-    
-    waitForInverterInit();
 
     if (buzzOk) {
         Serial.println("RTD Successful.");
     } else {
         Serial.println("RTD failed.");
     }
+}
+
+void runBrakeLightTest() {
+    
 }

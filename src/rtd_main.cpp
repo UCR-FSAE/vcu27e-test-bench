@@ -14,7 +14,6 @@ void setup() {
     setupPins();
     //setupDAC();
     setupCANBlocking();
-    resetVCU();
     runRTDTest();
 }
 
