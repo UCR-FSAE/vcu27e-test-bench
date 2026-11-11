@@ -34,10 +34,10 @@ void writeDAC(float apps1_v, float apps2_v, float bse_v) {
     uint16_t vc = voltsToDAC(bse_v);
     uint16_t vd = 0;
 
-    dac.setChannelValue(MCP4728_CHANNEL_A, va, MCP4728_VREF_INTERNAL, MCP4728_GAIN_1X);
-    dac.setChannelValue(MCP4728_CHANNEL_B, vb, MCP4728_VREF_INTERNAL, MCP4728_GAIN_1X);
-    dac.setChannelValue(MCP4728_CHANNEL_C, vc, MCP4728_VREF_INTERNAL, MCP4728_GAIN_1X);
-    dac.setChannelValue(MCP4728_CHANNEL_D, vd, MCP4728_VREF_INTERNAL, MCP4728_GAIN_1X);
+    dac.setChannelValue(MCP4728_CHANNEL_A, va, MCP4728_VREF_VDD, MCP4728_GAIN_1X);
+    dac.setChannelValue(MCP4728_CHANNEL_B, vb, MCP4728_VREF_VDD, MCP4728_GAIN_1X);
+    dac.setChannelValue(MCP4728_CHANNEL_C, vc, MCP4728_VREF_VDD, MCP4728_GAIN_1X);
+    dac.setChannelValue(MCP4728_CHANNEL_D, vd, MCP4728_VREF_VDD, MCP4728_GAIN_1X);
 }
 
 void setIdlePedals() {
@@ -141,7 +141,6 @@ void beRTD() {
 
 // TODO: Implement case when tractive system is disabled in middle of sequence.
 void runRTDTest() {
-    resetVCU();
     enum TestState { NOTHING, BUZZ_HIGH, BUZZ_LOW, DONE };
     TestState state = BUZZ_HIGH;
 
