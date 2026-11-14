@@ -129,10 +129,6 @@ void waitForInverterInit() {
     Serial.println("Inverter Initialization Successful.");
 }
 
-bool buzzerOn() {
-    return digitalRead(PIN_BUZZER_MONITOR);
-}
-
 void beRTD() {
     digitalWrite(PIN_TS_ACTIVE_SIM, HIGH);
     writeDAC(APPS1_MIN_V, APPS2_MIN_V, BRAKES_ACTIVATION_THRESHOLD_V + .5f);
@@ -141,28 +137,33 @@ void beRTD() {
 
 // TODO: Implement case when tractive system is disabled in middle of sequence.
 void runRTDTest() {
-    enum TestState { NOTHING, BUZZ_HIGH, BUZZ_LOW, DONE };
-    TestState state = BUZZ_HIGH;
+    enum TestState { NOTHING, WAIT_BUZZ_HIGH, WAIT_BUZZ_LOW, DONE };
+    TestState state = NOTHING;
 
     unsigned long highStart = 0;
     unsigned long highMs = 0;
+    bool buzzerOn = false;
     bool buzzOk = false;
 
     Serial.println("RTD test start");
 
-    beRTD();
-
     while (state != DONE) {
+        buzzerOn = digitalRead(PIN_BUZZER_MONITOR);
+        
         switch (state) {
+            case NOTHING:
+                beRTD();
+                state = WAIT_BUZZ_HIGH;
+                break;
             case BUZZ_HIGH:
-                if (buzzerOn()) {
+                if (buzzerOn) {
                     highStart = millis();
                     state = BUZZ_LOW;
                     Serial.println("RTD buzzer HIGH");
                 }
                 break;
             case BUZZ_LOW:
-                if (!buzzerOn()) {
+                if (!buzzerOn) {
                     highMs = millis() - highStart;
                     buzzOk = highMs >= BUZZER_TIME_MIN_MS &&
                              highMs <= BUZZER_TIME_MAX_MS;
@@ -173,6 +174,8 @@ void runRTDTest() {
                     Serial.println(buzzOk ? " in range" : " out of range");
                     state = DONE;
                 }
+                break;
+            case DONE:
                 break;
         }
     }
