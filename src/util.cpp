@@ -199,7 +199,6 @@ void runBrakeLightTest() {
     delay(100);
     
     Serial.println("Brake pressed, should be on");
-    Serial.println(analogRead(PIN_BRAKE_LIGHT_MONITOR));
     if (digitalRead(PIN_BRAKE_LIGHT_MONITOR)) {
         Serial.println("True");
     } else {
