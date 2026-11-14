@@ -12,7 +12,7 @@
 void setup() {
     setupSerialBlocking();
     setupPins();
-    setupDAC();
+    //setupDAC();
     setupCANBlocking();
     runRTDTest();
 }

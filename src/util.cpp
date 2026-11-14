@@ -132,7 +132,7 @@ void waitForInverterInit() {
 void beRTD() {
     digitalWrite(PIN_TS_ACTIVE_SIM, HIGH);
     writeDAC(APPS1_MIN_V, APPS2_MIN_V, BRAKES_ACTIVATION_THRESHOLD_V + .5f);
-    digitalWrite(PIN_DRIVER_ACTION_SIM, LOW);
+    digitalWrite(PIN_DRIVER_ACTION_SIM, HIGH);
 }
 
 // TODO: Implement case when tractive system is disabled in middle of sequence.
@@ -155,14 +155,14 @@ void runRTDTest() {
                 beRTD();
                 state = WAIT_BUZZ_HIGH;
                 break;
-            case BUZZ_HIGH:
+            case WAIT_BUZZ_HIGH:
                 if (buzzerOn) {
                     highStart = millis();
-                    state = BUZZ_LOW;
+                    state = WAIT_BUZZ_LOW;
                     Serial.println("RTD buzzer HIGH");
                 }
                 break;
-            case BUZZ_LOW:
+            case WAIT_BUZZ_LOW:
                 if (!buzzerOn) {
                     highMs = millis() - highStart;
                     buzzOk = highMs >= BUZZER_TIME_MIN_MS &&
